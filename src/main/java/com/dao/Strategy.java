@@ -1,4 +1,4 @@
-package com.fxdb;
+package com.dao;
 
 public abstract class Strategy {
 

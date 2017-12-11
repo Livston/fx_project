@@ -1,5 +1,7 @@
 package com.fxdb;
 
+import com.dao.Chart;
+
 import java.sql.*;
 import java.sql.Date;
 import java.text.DateFormat;
@@ -189,7 +191,7 @@ public class DBWorker {
 
          String sql = "SELECT * FROM M5 WHERE TIME >= ? AND TIME < ?";
 
-        try {
+         try {
             preparedStatement = connection.prepareStatement(sql);
 
             preparedStatement.setString(1, "2015-01-01 00:00:00");
@@ -233,5 +235,97 @@ public class DBWorker {
         
         
      }
+
+     public ArrayList <Chart> listH4(){
+
+         ArrayList <Chart> list = new ArrayList<Chart>();
+
+         String sql = "SELECT * FROM M5 WHERE TIME >= ? AND TIME < ?";
+
+         try {
+             preparedStatement = connection.prepareStatement(sql);
+
+             preparedStatement.setString(1, "2001-01-01 00:00:00");
+             preparedStatement.setString(2, "2015-12-12  00:00:00");
+
+             resultSet = preparedStatement.executeQuery();
+
+
+             boolean firstIteration = true;
+             while (resultSet.next()){
+
+                 java.sql.Time dbSqlTime = resultSet.getTime("time");
+                 String dbSqlTimeString = dbSqlTime.toString();
+
+                 java.util.Date dbSqlTimeConverted = new java.util.Date(dbSqlTime.getTime());
+
+
+
+
+                 if (firstIteration){
+                     Chart chart = new Chart(dbSqlTimeConverted, 0.0,0.0, 0.0,0.0);
+                     list.add(chart);
+                 }
+
+
+
+                 if (dbSqlTimeString.equals("00:00:00")
+                         || dbSqlTimeString.equals("04:00:00")
+                         || dbSqlTimeString.equals("08:00:00")
+                         || dbSqlTimeString.equals("12:00:00")
+                         || dbSqlTimeString.equals("16:00:00")
+                         || dbSqlTimeString.equals("20:00:00")
+                         ) {
+
+                     Chart chart = new Chart(dbSqlTimeConverted, 0.0, 0.0, 0.0, 0.0);
+
+                     chart.list.add(new  Chart(dbSqlTimeConverted, resultSet.getDouble("Open"),resultSet.getDouble("Hight"), resultSet.getDouble("Low"),resultSet.getDouble("Close")));
+
+                     firstIteration = false;
+
+                 }else {
+                     //chart.list.add(new  Chart(dbSqlTimeConverted, resultSet.getDouble("Open"),resultSet.getDouble("Hight"), resultSet.getDouble("Low"),resultSet.getDouble("Close")));
+
+                     firstIteration = false;
+
+                 }
+
+
+
+                 //                 list.add(new Chart(dbSqlTimeConverted. = , )
+//
+//
+//
+//                         dbSqlTimeConverted,  new double[] {
+//                         resultSet.getDouble("Open"),
+//                         resultSet.getDouble("Hight"),
+//                         resultSet.getDouble("Low"),
+//                         resultSet.getDouble("Close")});
+             }
+
+
+         } catch (SQLException e) {
+             e.printStackTrace();
+         } finally {
+             try {
+                 if (resultSet != null) resultSet.close();
+             } catch (Exception e) {
+             }
+             try {
+                 if (statement != null) statement.close();
+             } catch (Exception e) {
+             }
+             try {
+                 if (connection != null) connection.close();
+             } catch (Exception e) {
+             }
+         }
+
+         return list;
+
+
+     }
+
+
 
 }

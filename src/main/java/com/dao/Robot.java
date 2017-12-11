@@ -1,6 +1,6 @@
-package com.fxdb;
+package com.dao;
 
-import com.sun.org.apache.xpath.internal.operations.Or;
+import com.fxdb.DBWorker;
 
 import java.util.*;
 
@@ -130,4 +130,11 @@ public class Robot {
 
     }
 
+
+    public void GetAnalize (){
+
+        DBWorker dbWorker = new DBWorker();
+        ArrayList <Chart> list = dbWorker.listH4();
+
+    }
 }
