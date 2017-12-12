@@ -236,9 +236,10 @@ public class DBWorker {
         
      }
 
-     public ArrayList <Chart> listH4(){
+     public ArrayList <Chart> getlistH4(){
 
-         ArrayList <Chart> list = new ArrayList<Chart>();
+         ArrayList <Chart> listH4 = new ArrayList<Chart>();
+         ArrayList <Chart> listM5 = new ArrayList<Chart>();
 
          String sql = "SELECT * FROM M5 WHERE TIME >= ? AND TIME < ?";
 
@@ -251,58 +252,75 @@ public class DBWorker {
              resultSet = preparedStatement.executeQuery();
 
 
-             boolean firstIteration = true;
-             while (resultSet.next()){
+             while (resultSet.next()) {
 
                  java.sql.Time dbSqlTime = resultSet.getTime("time");
-                 String dbSqlTimeString = dbSqlTime.toString();
-
                  java.util.Date dbSqlTimeConverted = new java.util.Date(dbSqlTime.getTime());
 
-
-
-
-                 if (firstIteration){
-                     Chart chart = new Chart(dbSqlTimeConverted, 0.0,0.0, 0.0,0.0);
-                     list.add(chart);
-                 }
-
-
-
-                 if (dbSqlTimeString.equals("00:00:00")
-                         || dbSqlTimeString.equals("04:00:00")
-                         || dbSqlTimeString.equals("08:00:00")
-                         || dbSqlTimeString.equals("12:00:00")
-                         || dbSqlTimeString.equals("16:00:00")
-                         || dbSqlTimeString.equals("20:00:00")
-                         ) {
-
-                     Chart chart = new Chart(dbSqlTimeConverted, 0.0, 0.0, 0.0, 0.0);
-
-                     chart.list.add(new  Chart(dbSqlTimeConverted, resultSet.getDouble("Open"),resultSet.getDouble("Hight"), resultSet.getDouble("Low"),resultSet.getDouble("Close")));
-
-                     firstIteration = false;
-
-                 }else {
-                     //chart.list.add(new  Chart(dbSqlTimeConverted, resultSet.getDouble("Open"),resultSet.getDouble("Hight"), resultSet.getDouble("Low"),resultSet.getDouble("Close")));
-
-                     firstIteration = false;
-
-                 }
-
-
-
-                 //                 list.add(new Chart(dbSqlTimeConverted. = , )
-//
-//
-//
-//                         dbSqlTimeConverted,  new double[] {
-//                         resultSet.getDouble("Open"),
-//                         resultSet.getDouble("Hight"),
-//                         resultSet.getDouble("Low"),
-//                         resultSet.getDouble("Close")});
+                 listM5.add(new Chart(dbSqlTimeConverted,
+                         resultSet.getDouble("Open"),
+                         resultSet.getDouble("Hight"),
+                         resultSet.getDouble("Low"),
+                         resultSet.getDouble("Close")));
              }
 
+
+
+             listH4.add(new Chart(listM5.get(0).timeOpen, listM5.get(0).open, listM5.get(0).hight, listM5.get(0).low,
+                     listM5.get(0).close));
+             listH4.get(0).list.add(new Chart(listM5.get(0).timeOpen, listM5.get(0).open, listM5.get(0).hight, listM5.get(0).low, listM5.get(0).close));
+
+             Calendar calendar = GregorianCalendar.getInstance();
+
+             int numOfHours;
+             int numOfMinutes;
+             int numOfSec;
+             int numOfDay;
+
+             boolean newH4 = false;
+
+             for (int i = 1; i < listM5.size(); i++) {
+
+                 calendar.setTime(listH4.get(listH4.size() - 1).timeOpen);
+                 int previousDay = calendar.get(Calendar.DAY_OF_YEAR);
+
+                 calendar.setTime(listM5.get(i).timeOpen);
+
+                 numOfHours = calendar.get(Calendar.HOUR_OF_DAY);
+                 numOfMinutes = calendar.get(Calendar.MINUTE);
+                 numOfSec = calendar.get(Calendar.SECOND);
+                 numOfDay = calendar.get(Calendar.DAY_OF_YEAR);
+
+                 newH4 = numOfDay != previousDay || (
+                         (numOfHours == 0 && numOfMinutes == 0 && numOfSec == 0)
+                                 || (numOfHours == 4 && numOfMinutes == 0 && numOfSec == 0)
+                                 || (numOfHours == 8 && numOfMinutes == 0 && numOfSec == 0)
+                                 || (numOfHours == 12 && numOfMinutes == 0 && numOfSec == 0)
+                                 || (numOfHours == 16 && numOfMinutes == 0 && numOfSec == 0)
+                                 || (numOfHours == 20 && numOfMinutes == 0 && numOfSec == 0)
+                 );
+
+                 if (newH4) {
+
+                     listH4.add(new Chart(listM5.get(i).timeOpen, listM5.get(i).open, listM5.get(i).hight, listM5.get(i).low,
+                             listM5.get(i).close));
+                     listH4.get(listH4.size() - 1).list.add(new Chart(listM5.get(i).timeOpen, listM5.get(i).open, listM5.get(i).hight, listM5.get(i).low, listM5.get(i).close));
+
+                 } else {
+
+                     listH4.get(listH4.size() - 1).list.add(new Chart(listM5.get(i).timeOpen, listM5.get(i).open, listM5.get(i).hight, listM5.get(i).low, listM5.get(i).close));
+
+                 }
+
+             }
+
+             for (Chart chart: listH4) {
+
+                 chart.establishLevels();
+
+             }
+
+             System.out.println("1");
 
          } catch (SQLException e) {
              e.printStackTrace();
@@ -321,7 +339,7 @@ public class DBWorker {
              }
          }
 
-         return list;
+         return listH4;
 
 
      }

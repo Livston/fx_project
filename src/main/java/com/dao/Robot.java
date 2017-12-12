@@ -134,7 +134,7 @@ public class Robot {
     public void GetAnalize (){
 
         DBWorker dbWorker = new DBWorker();
-        ArrayList <Chart> list = dbWorker.listH4();
+        ArrayList <Chart> list = dbWorker.getlistH4();
 
     }
 }

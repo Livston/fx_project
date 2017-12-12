@@ -21,4 +21,17 @@ public class Chart {
         this.low = low;
         this.close = close;
     }
+
+    public void establishLevels(){
+
+        for (Chart chart: list) {
+
+           this.hight = Math.max(this.hight, chart.hight);
+           this.low = Math.min(this.low, chart.low);
+
+        }
+
+        this.close = list.get(list.size()-1).close;
+
+    }
 }
