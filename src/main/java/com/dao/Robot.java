@@ -6,6 +6,8 @@ import java.util.*;
 
 public class Robot {
 
+    int numOfAnalize = 10;
+
     private LinkedList<Order> ordersBuy = new LinkedList<Order>();
     private LinkedList<Order> ordersSell = new LinkedList<Order>();
     private ArrayList<Order> closedOrders = new ArrayList<Order>();
@@ -135,6 +137,45 @@ public class Robot {
 
         DBWorker dbWorker = new DBWorker();
         ArrayList <Chart> list = dbWorker.getlistH4();
+
+        for (int cursor = list.size() - 1; cursor >=numOfAnalize ; cursor--) {
+
+            List<Chart> analizingList = list.subList(cursor - numOfAnalize, cursor);
+
+            for (int i = 0; i < list.size() - numOfAnalize; i++) {
+
+                List<Chart> regardList = list.subList(i, i + numOfAnalize);
+
+                analize(regardList, analizingList);
+
+            }
+
+        }
+
+    }
+
+    public void analize(List<Chart> A, List<Chart> B){
+
+        double koef = 0.0;
+
+        double firstKoef = (A.get(0).close - B.get(0).open);
+
+
+        for (int i = 0; i < numOfAnalize; i++) {
+
+            Chart chartA = A.get(i);
+            Chart chartB = B.get(i);
+
+
+
+        }
+
+
+        for (Chart chart: A) {
+            //System.out.println("1");
+
+        }
+
 
     }
 }
