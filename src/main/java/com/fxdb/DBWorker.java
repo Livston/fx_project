@@ -246,7 +246,7 @@ public class DBWorker {
          try {
              preparedStatement = connection.prepareStatement(sql);
 
-             preparedStatement.setString(1, "2001-01-01 00:00:00");
+             preparedStatement.setString(1, "2010-01-01 00:00:00");
              preparedStatement.setString(2, "2015-12-12  00:00:00");
 
              resultSet = preparedStatement.executeQuery();

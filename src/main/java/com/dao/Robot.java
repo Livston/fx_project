@@ -7,6 +7,7 @@ import java.util.*;
 public class Robot {
 
     int numOfAnalize = 10;
+    ArrayList<Double> div = new ArrayList<Double>();
 
     private LinkedList<Order> ordersBuy = new LinkedList<Order>();
     private LinkedList<Order> ordersSell = new LinkedList<Order>();
@@ -146,19 +147,28 @@ public class Robot {
 
                 List<Chart> regardList = list.subList(i, i + numOfAnalize);
 
-                analize(regardList, analizingList);
+                AbsolutCompaire(regardList, analizingList);
 
             }
 
         }
 
+        Collections.sort(div);
+
+        for (double d: div) {
+            System.out.println(d);
+        }
+
+        System.out.println(div.size());
+
     }
 
-    public void analize(List<Chart> A, List<Chart> B){
+    public void AbsolutCompaire(List<Chart> A, List<Chart> B) {
 
-        double koef = 0.0;
-
-        double firstKoef = (A.get(0).close - B.get(0).open);
+        double deviationCO;
+        double deviationHL;
+        double deviationChart;
+        double deviationTotal = 0.0;
 
 
         for (int i = 0; i < numOfAnalize; i++) {
@@ -166,16 +176,18 @@ public class Robot {
             Chart chartA = A.get(i);
             Chart chartB = B.get(i);
 
+            deviationCO = (chartA.close - chartA.open) / (chartB.close - chartB.open);
+            deviationHL = (chartA.hight - chartA.low) / (chartB.hight - chartB.low);
 
+            deviationChart = (deviationCO + deviationHL) / 2;
+
+            deviationTotal = deviationTotal + ((deviationChart < 0) ? -deviationChart : deviationChart);
 
         }
 
-
-        for (Chart chart: A) {
-            //System.out.println("1");
-
+        if (deviationTotal < 2.0) {
+            div.add(deviationTotal);
         }
-
-
     }
+
 }
